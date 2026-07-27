@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";\nimport { createShuffleBag } from "./activityRandomizer";
+import { useEffect, useRef, useState } from "react";
+import { createShuffleBag } from "./activityRandomizer";
 
 const activities = [
   {
