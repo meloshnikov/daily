@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";\nimport { createShuffleBag } from "./activityRandomizer";
 
 const activities = [
   {
@@ -24,9 +24,9 @@ const activities = [
     description: "Каждое утро предсказывай погоду для всей команды.",
   },
   {
-    name: "Вы из Англии",
-    icon: "🇬🇧",
-    description: "Один статус в день рассказывай с безупречным английским акцентом.",
+    name: "Сам себе режиссёр",
+    icon: "🎬",
+    description: "Подключайся на Дейли с камерой и фоном на выбор всю неделю.",
   },
   {
     name: "Джокер",
@@ -35,18 +35,14 @@ const activities = [
   },
 ] as const;
 
-function randomIndex(max: number) {
-  const values = new Uint32Array(1);
-  crypto.getRandomValues(values);
-  return values[0] % max;
-}
-
 export default function Home() {
   const [rotation, setRotation] = useState(0);
   const [uprightRotation, setUprightRotation] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const bagRef = useRef<number[]>([]);
+  const lastSelectedRef = useRef<number | null>(null);
 
   useEffect(() => {
     return () => {
@@ -57,7 +53,14 @@ export default function Home() {
   const spin = () => {
     if (isSpinning) return;
 
-    const next = randomIndex(activities.length);
+    if (bagRef.current.length === 0) {
+      bagRef.current = createShuffleBag(
+        activities.length,
+        lastSelectedRef.current,
+      );
+    }
+    const next = bagRef.current.shift()!;
+    lastSelectedRef.current = next;
     const currentMod = ((rotation % 360) + 360) % 360;
     const targetMod = (360 - next * 60) % 360;
     const adjustment = (targetMod - currentMod + 360) % 360;
